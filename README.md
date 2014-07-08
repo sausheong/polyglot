@@ -16,11 +16,13 @@ As a programmer you trade-off complexity and effort for something you think is m
 
 1. Performance scalability -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
 2. Modularity -- Polyglot responders can be chained, each doing an individual piece of processing, encouraging reusability of code
-3. Multi-lingual development -- Polyglot responders can be developed in multiple programming languages, **at the same time**
+3. Extensibility -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
+4. Multi-lingual development -- Polyglot responders can be developed in multiple programming languages, **at the same time**
+
 
 Polyglot is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
 
-The first and second are understandable, but the third is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
+The first three are understandable, but the fourth is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
 
 1. Web applications you write are systems and they change over time and can be written or maintained by different groups of people. If you're not restricted to a particular platform or language, then the chances of getting an incrementally better piece of software is higher. 
 2. Also, by forcing the deliberate use of different programming languages, you are forced to separate the layers and make each component more independent and robust, being able to switch out the poor-performing responders and replacing them with higher-performing ones
@@ -34,7 +36,7 @@ Is Polyglot for your web application?
 
 Polyglot has a very simple and basic architecture. It consists of 3 main components:
 
-1. **Acceptor** - the acceptor is a HTTP interface that takes in a HTTP request and provides a HTTP response. The acceptor takes in a HTTP request converts it into a generic message and drops it into the message queue. Then depending on what is asked, it will return the appropriate HTTP response. The implementation of the acceptor is in Go.
+1. **Acceptor** - the acceptor is a HTTP interface that takes in a HTTP request and provides a HTTP response. The acceptor takes in a HTTP request converts it into a generic message and drops it into the message queue. Then depending on what is asked, it will return the appropriate HTTP response. The default implementation of the acceptor is in Go. To extend an existing web application, you can implement the acceptor as a controller in that web application.
 2. **Messsage queue** - a queue that receives the messages that represent the HTTP request. the acceptor accepts HTTP requests and converts the requests into messages that goes into the message queue. The messages then gets picked up by the next component, the responder. The implementation of the message queue is a RabbitMQ server.
 3. **Responder** - the responder is a standalone process written in any language that picks up messages from the message queue and responds to it accordingly. In most web frameworks this is usually called the controller. However unlike most web framework controllers, the responders are actual independent processes that can potentially sit in any connected remote server. Responders contain the "business logic" of your code. 
 
@@ -68,7 +70,9 @@ The chained flow goes like this:
 
 ### Acceptor
 
-The acceptor is a communications unit that interacts with the external world (normally a browser). It is implemented as a simple web application written in Go, using the Gin framework (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
+The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go, using the Gin framework (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
+
+You can also extend an existing application by creating a controller in that application as an acceptor. 
 
 ### Message Queue
 
@@ -87,6 +91,14 @@ A responder can be a first and final responder if it responds to a message from 
 
 ## Installation
 
+### Acceptor
+
+
+### Message queue
+
+
+### Responder
+
 
 
 ## Writing responders
@@ -104,4 +116,6 @@ A responder can be a first and final responder if it responds to a message from 
 
 ## Extending the default acceptor
 
+
+## Extending an existing application
 
