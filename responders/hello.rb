@@ -1,6 +1,13 @@
 require "./polyglot"
 
 class Hello < Polyglot::Responder
+  
+  def initialize
+    super
+    @method = "GET"
+    @path = "hello"
+  end
+  
   def respond(json)
     puts "data received:"
     puts json

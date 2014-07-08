@@ -19,17 +19,17 @@ func failOnError(err error, msg string) {
   }
 }
 
-func input(c *gin.Context) {
+func process(c *gin.Context) {
+
   c.Req.ParseForm()
   c.Req.ParseMultipartForm(1024)
-  c.Keys = make(map[string]interface{})  
+
   // marshal the HTTP request struct into JSON
   req_json, err := json.Marshal(c.Req)
+  
+  routeId := c.Req.Method + c.Req.URL.Path
   failOnError(err, "Failed to marshal the request")  
-  c.Keys["request"] = string(req_json)
-}
-
-func process(c *gin.Context) {
+  
   conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
   failOnError(err, "Failed to connect to RabbitMQ")
   defer conn.Close()
@@ -38,24 +38,32 @@ func process(c *gin.Context) {
   failOnError(err, "Failed to open a channel")
   defer ch.Close()
 
+  _, err = ch.QueueInspect(routeId); if err != nil {
+    c.Writer.WriteHeader(404)
+    c.Writer.Write([]byte("Not Found"))
+    return
+  }
+
   // declare the response queue used to receive responses from the responders
   replyq, err := ch.QueueDeclare(
-    "RPC",   // name
-    false,   // durable
-    false,   // delete when usused
-    false,   // exclusive
-    false,   // noWait
-    nil,     // arguments
+    routeId + ":[r]",    // name
+    false,              // durable
+    true,               // delete when unused
+    false,              // exclusive
+    false,              // noWait
+    nil,                // arguments
   )
   
   // assert type of the body
-  body := c.Keys["request"].(string)
+  body := req_json
   
   // publish the request into the polyglot queue
   corrId, _ := uuid.NewV4()
+
+  
   err = ch.Publish(
     "",         // default exchange
-    "polyglot", // routing key
+    routeId,    // routing key
     false,      // mandatory
     false,
     amqp.Publishing {
@@ -64,6 +72,7 @@ func process(c *gin.Context) {
       CorrelationId: corrId.String(),
       ReplyTo:       replyq.Name,
       Body:          []byte(body),
+      AppId:         routeId,
     })
   failOnError(err, "Failed to publish a message")  
 
@@ -90,17 +99,12 @@ func process(c *gin.Context) {
   err = ch.Cancel("send", false)
   failOnError(err, "Failed to cancel channel") 
   
-  c.Keys["response"] = string(response)
-}
-
-
-func output(c *gin.Context) {
   // get response JSON array 
-  res := c.Keys["response"].(string)
+  res := string(response)
   
   // unmarshal JSON into status, headers and body
   var r interface{}
-  err := json.Unmarshal([]byte(res), &r); if err == nil {
+  err = json.Unmarshal([]byte(res), &r); if err == nil {
     response := r.([]interface{})
     status := response[0]
     headers := response[1].(map[string]interface{})
