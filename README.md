@@ -40,7 +40,7 @@ Polyglot has a very simple and basic architecture. It consists of 3 main compone
 
 Essentially, the Polyglot architecture revolves around using a messaging queue to disassociate the processing units (responders) from the communications unit (acceptor), allowing the responders to be created in multiple languages.
 
-##Flow
+###Flow
 
 There are two basic types of flows in Polyglot.
 
@@ -66,15 +66,15 @@ The chained flow goes like this:
 9. The acceptor uses the HTTP status code, response headers and the body, creates a HTTP response and sends it to the client
 
 
-## Acceptor
+### Acceptor
 
 The acceptor is a communications unit that interacts with the external world (normally a browser). It is implemented as a simple web application written in Go, using the Gin framework (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
 
-## Message Queue
+### Message Queue
 
 The message queue is a generic AMQP message queue, implemented using RabbitMQ. 
 
-## Responder
+### Responder
 
 Responders are processing units that can be written in any programming language that can communicate with the message queue. Responders are normally written as standalone processes that wait on the message queue. All responders essentially do the same thing, which is to process incoming requests but there are 3 types of responders that behave slightly differently:
 
@@ -83,3 +83,25 @@ Responders are processing units that can be written in any programming language 
 3. Chained responder -- this is a responder that takes a message from a responder and creates a message to another responder
 
 A responder can be a first and final responder if it responds to a message from the acceptor and returns a message to the same acceptor. 
+
+
+## Installation
+
+
+
+## Writing responders
+
+### Ruby
+
+
+### Python
+
+
+### PHP
+
+
+
+
+## Extending the default acceptor
+
+
