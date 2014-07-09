@@ -1,0 +1,2 @@
+hello: ruby -C ./ruby hello.rb
+foo: ruby -C ./ruby foo.rb

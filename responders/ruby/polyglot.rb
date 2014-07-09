@@ -1,5 +1,6 @@
-require 'bundler'
-Bundler.require
+require 'bunny'
+require 'json'
+require 'haml'
 require 'base64'
 
 module Polyglot
@@ -22,7 +23,7 @@ module Polyglot
       ch.prefetch(1)
       puts "[Responder ready]."
       
-      while true
+      loop do
         begin
           q.subscribe(ack: true, block: true) do |delivery_info, properties, body|
             # Only respond to this route ID
