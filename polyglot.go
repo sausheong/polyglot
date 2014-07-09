@@ -5,6 +5,7 @@ import (
   "github.com/nu7hatch/gouuid"
   "github.com/streadway/amqp"
   "encoding/json"
+  "encoding/base64"
   "log"
   "fmt"
   // "net/http"
@@ -99,6 +100,7 @@ func process(c *gin.Context) {
   err = ch.Cancel("send", false)
   failOnError(err, "Failed to cancel channel") 
   
+  
   // get response JSON array 
   res := string(response)
   
@@ -116,9 +118,10 @@ func process(c *gin.Context) {
     }
     s, _ := status.(float64)
     b, _ := body.(string)
+    data, _ := base64.StdEncoding.DecodeString(b)
 
     // write status and body to response
     c.Writer.WriteHeader(int(s))
-    c.Writer.Write([]byte(b))
+    c.Writer.Write([]byte(data))
   }
 }

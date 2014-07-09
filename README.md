@@ -6,7 +6,7 @@ _Polyglot is experimental software. Please use with caution and at your own risk
 
 Programmers use web frameworks to simplify the effort to develop web applications. Web frameworks reduce the overhead of work that needs to be done in most web applications. This reduces time and effort needed, improving stability and creating a consistent and maintainable system. Web application frameworks are written in a single, major programming language, like Ruby with Ruby on Rails, Python with Django, Java with Spring or Javascript with Angular.js. 
 
-Polyglot is a web framework that increases the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
+Polyglot is a web framework that *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
 
 So what good is that?? 
 
@@ -14,13 +14,13 @@ The answer is **trade-offs**.
 
 As a programmer you trade-off complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
 
-1. Performance scalability -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
-2. Modularity -- Polyglot responders can be chained, each doing an individual piece of processing, encouraging reusability of code
-3. Extensibility -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
-4. Multi-lingual development -- Polyglot responders can be developed in multiple programming languages, **at the same time**
+1. **Performance scalability** -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
+2. **Modularity** -- Polyglot responders can be chained, each doing an individual piece of processing, encouraging reusability of code
+3. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
+4. **Multi-lingual development** -- Polyglot responders can be developed in multiple programming languages, **at the same time**
 
 
-Polyglot is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
+*Polyglot* is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
 
 The first three are understandable, but the fourth is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
 
