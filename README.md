@@ -158,6 +158,19 @@ If you want to run this in production, use Foreman to export out the configurati
 
 ## Writing responders
 
+Writing responders are quite easy. There are basically only a few steps to follow:
+
+1. Set up the route ID. This is basically the HTTP method followed by `/_/` and then the route path. For example, if you want to set up a responder for a GET request going to the route `/_/hello` then set up the route ID to be `GET/_/hello`
+2. Connect to the message queue using whichever AMQP library the language has
+3. Consume a queue with the name of the route ID. Whenever a request is sent to the acceptor, your responder will receive a JSON formatted message which essentially contains the HTTP request details
+4. Check if the message's `app_id` matches the route ID. If it does, then you should process the message, otherwise you should ignore it
+5. After doing what you want your responder to do, publish an array to the return queue (the routing key is the `reply-to` property of the message). The array should consist of 3 parts:
+    1. The HTTP response status. For example, if everything is fine, this is 200, if you want to redirect, this will be 302, if it's an error it should be a 5xx
+    2. A hash/map/dictionary of headers. You should try to put in at least the 'Content-Type' header
+    3. The HTTP response body. This must be a string
+
+The examples below shows how this can be done in various languages.
+
 ### Ruby
 
 The default implementation for Ruby responders follow a very simple pattern. Most of the heavy lifting is done in the `polyglot.rb` file. I use [Bunny](http://rubybunny.info/) to access the message queue.
