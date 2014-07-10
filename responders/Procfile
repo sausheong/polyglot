@@ -1,2 +1,3 @@
-hello: ruby -C ./ruby hello.rb
-foo: ruby -C ./ruby foo.rb
+hello_ruby: ruby -C ./ruby hello.rb
+foo_ruby: ruby -C ./ruby foo.rb
+hello_php: php ./php/hello.php

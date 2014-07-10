@@ -8,6 +8,7 @@ import (
   "encoding/base64"
   "log"
   "fmt"
+  "strings"
   // "net/http"
   // "reflect"
 )
@@ -112,16 +113,30 @@ func process(c *gin.Context) {
     headers := response[1].(map[string]interface{})
     body := response[2]
     
+
+    
     // write headers
     for k, v := range headers {
       c.Writer.Header().Set(k, v.(string))
     }
     s, _ := status.(float64)
     b, _ := body.(string)
-    data, _ := base64.StdEncoding.DecodeString(b)
+    var data []byte
+    
+    // get content type    
+    ctype, hasCType := headers["Content-Type"].(string); if hasCType == true {
+      if strings.HasPrefix(ctype, "text") {
+        data = []byte(b)
+      } else {
+        data, _ = base64.StdEncoding.DecodeString(b)
+      }
+    } else {
+      data, _ = base64.StdEncoding.DecodeString(b)
+    }
+
 
     // write status and body to response
     c.Writer.WriteHeader(int(s))
-    c.Writer.Write([]byte(data))
+    c.Writer.Write(data)
   }
 }

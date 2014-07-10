@@ -50,7 +50,7 @@ module Polyglot
     
     # Convenience method to return HTML
     def html(body)
-      [200, {"Content-Type" => "text/html"}, Base64.encode64(body)]
+      [200, {"Content-Type" => "text/html"}, body]
     end
     
     # Convenience method to redirect to the given url
