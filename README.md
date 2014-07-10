@@ -4,7 +4,7 @@ _Polyglot is experimental software. Please use with caution and at your own risk
 
 ## What is it?
 
-Programmers use web frameworks to simplify the effort to develop web applications. Web frameworks reduce the overhead of work that needs to be done in most web applications. This reduces time and effort needed, improving stability and creating a consistent and maintainable system. Web application frameworks are written in a single, major programming language, like Ruby with Ruby on Rails, Python with Django, Java with Spring or Javascript with Angular.js. 
+Programmers use [web frameworks](http://en.wikipedia.org/wiki/Web_application_framework) to simplify the effort to develop web applications. Web frameworks reduce the overhead of work that needs to be done in most web applications. This reduces time and effort needed, improving stability and creating a consistent and maintainable system. Web application frameworks are written in a single, major programming language, like Ruby with Ruby on Rails, Python with Django, Java with Spring or Javascript with Angular.js. 
 
 Polyglot is a web framework that *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
 
@@ -70,13 +70,13 @@ The chained flow goes like this:
 
 ### Acceptor
 
-The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go, using the Gin framework (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
+The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go, using the [Gin framework](http://gin-gonic.github.io/gin/) (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
 
 You can also extend an existing application by creating a controller in that application as an acceptor. 
 
 ### Message Queue
 
-The message queue is a generic AMQP message queue, implemented using RabbitMQ. 
+The message queue is a generic [AMQP](http://www.amqp.org) message queue, implemented using [RabbitMQ](https://www.rabbitmq.com/). 
 
 ### Responder
 
@@ -89,16 +89,69 @@ Responders are processing units that can be written in any programming language 
 A responder can be a first and final responder if it responds to a message from the acceptor and returns a message to the same acceptor. 
 
 
-## Installation
+## Installation and setup
+
+My development environment in OS X Mavericks but it should work fine with most *nix-based environments. 
+
+First, clone this repository in to a [Go workspace](http://golang.org/doc/code.html). The default acceptor is written in Go and you'll need to build it.
 
 ### Acceptor
 
+The default polyglot acceptor is written in Go using the [Gin framework](http://gin-gonic.github.io/gin/). To install, just run:
+
+    go build
+    
+This should create a program called `polyglot`. To run the default acceptor:
+
+    ./polyglot
+    
+    
 
 ### Message queue
+
+The default message queue is RabbitMQ. You can find instructions to [download and install RabbitMQ in your environment here](https://www.rabbitmq.com/download.html). A couple of notable items if you've not used RabbitMQ before:
+
+1. The default username is 'guest' and the default password is also 'guest'
+2. The web admin URL is http://localhost:15672. You can do most queue management and administration through this interface
+3. The default 'guest' user can only connect via localhost, so if you're looking at deploying remote responders, please set up your [access control properly](https://www.rabbitmq.com/access-control.html)
+
+The default implementation of Polyglot makes no additional demands on RabbitMQ but if you're looking at something more secured, I would suggest to create a dedicated exchange and implement finer grained access control on RabbitMQ for eg setting up clients to publish and get on specific queues.
+
+Once you have installed RabbitMQ, you can start up the queue with this:
+
+    rabbitmq-server
 
 
 ### Responder
 
+The set of example responders are in the `responders` directory. To run them, you can either start them individually or you can use [Foreman](https://github.com/ddollar/foreman) like I do. 
+
+To start the responders individually, go to the respective directories for eg the `ruby` directory and do this:
+
+    ruby hello.rb
+    
+This will start up the `hello` Ruby responder. Note that you have only started 1 responder. To start up and manage a bunch of responders, open up `Procfile` in the responders directory.
+
+    hello_ruby: ruby -C ./ruby hello.rb
+    foo_ruby: ruby -C ./ruby foo.rb
+    hello_php: php ./php/hello.php
+
+You will notice that the file consists of lines of configuration that starts up the responders. Now open up the file `.foreman`.
+
+    concurrency: 
+      hello_ruby=5,
+      foo_ruby=5,
+      hello_php=5
+
+As you can see, each line after `concurrency:` is a responder. The number configuration is the number of responders you want to start up. In this case, I'm starting up 5 `hello_ruby`, `foo_ruby` and `hello_php` responders each.
+
+To start all the responders at once:
+
+    foreman start
+    
+If you want to run this in production, use Foreman to export out the configuration files in Upstart or launchd etc. If you want to run this in the background without being cut off when you log out:
+
+    nohup foreman start &
 
 
 ## Writing responders
