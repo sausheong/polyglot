@@ -18,7 +18,7 @@ $callback = function($req){
     $payload = [
       "200",
       ['Content-Type' => 'text/html'],
-      "<h1>Hello World!</h1>"
+      "<h1>Hello PHP!</h1>"
     ];
     $json = json_encode($payload);
 

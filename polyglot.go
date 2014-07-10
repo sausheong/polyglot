@@ -99,8 +99,7 @@ func process(c *gin.Context) {
   response := string(<-ret)
     
   err = ch.Cancel("send", false)
-  failOnError(err, "Failed to cancel channel") 
-  
+  failOnError(err, "Failed to cancel channel")   
   
   // get response JSON array 
   res := string(response)
@@ -112,9 +111,7 @@ func process(c *gin.Context) {
     status := response[0]
     headers := response[1].(map[string]interface{})
     body := response[2]
-    
 
-    
     // write headers
     for k, v := range headers {
       c.Writer.Header().Set(k, v.(string))
@@ -133,7 +130,6 @@ func process(c *gin.Context) {
     } else {
       data, _ = base64.StdEncoding.DecodeString(b)
     }
-
 
     // write status and body to response
     c.Writer.WriteHeader(int(s))

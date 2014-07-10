@@ -4,14 +4,11 @@ class Hello < Polyglot::Responder
   
   def initialize
     super
-    @method, @path = "GET", "hello"
+    @method, @path = "GET", "ruby/hello"
   end
   
   def respond(json)
-    puts json
-    haml = Haml::Engine.new(File.read("hello.haml"))
-    content = haml.render(Object.new, show_me: "Hello, world!")
-    html content
+    html "<h1>Hello Ruby!</h1>"
   end
 end 
 

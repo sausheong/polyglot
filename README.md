@@ -133,15 +133,17 @@ To start the responders individually, go to the respective directories for eg th
 This will start up the `hello` Ruby responder. Note that you have only started 1 responder. To start up and manage a bunch of responders, open up `Procfile` in the responders directory.
 
     hello_ruby: ruby -C ./ruby hello.rb
-    foo_ruby: ruby -C ./ruby foo.rb
     hello_php: php ./php/hello.php
+    hello_py: python ./python/hello.py
+    foo_ruby: ruby -C ./ruby foo.rb
 
 You will notice that the file consists of lines of configuration that starts up the responders. Now open up the file `.foreman`.
 
     concurrency: 
-      hello_ruby=5,
-      foo_ruby=5,
-      hello_php=5
+      hello_ruby=5,      
+      hello_php=5,
+      hello_py=5,
+      foo_ruby=5
 
 As you can see, each line after `concurrency:` is a responder. The number configuration is the number of responders you want to start up. In this case, I'm starting up 5 `hello_ruby`, `foo_ruby` and `hello_php` responders each.
 
@@ -158,13 +160,154 @@ If you want to run this in production, use Foreman to export out the configurati
 
 ### Ruby
 
+The default implementation for Ruby responders follow a very simple pattern. Most of the heavy lifting is done in the `polyglot.rb` file. I use [Bunny](http://rubybunny.info/) to access the message queue.
+
+```ruby
+require "./polyglot"
+
+class Hello < Polyglot::Responder
+
+  def initialize
+    super
+    @method, @path = "GET", "ruby/hello"
+  end
+
+  def respond(json)
+    html "<h1>Hello Ruby!</h1>"
+  end
+end 
+
+responder = Hello.new
+responder.run
+```
+
+Another simple example, using [Haml](http://haml.info/).
+
+```ruby
+require "./polyglot"
+
+class Hello < Polyglot::Responder
+  
+  def initialize
+    super
+    @method, @path = "GET", "haml/hello"
+  end
+  
+  def respond(json)
+    puts json
+    haml = Haml::Engine.new(File.read("hello.haml"))
+    content = haml.render(Object.new, show_me: "Hello, world!")
+    html content    
+  end
+end 
+
+responder = Hello.new
+responder.run
+```
+
+Here is the haml page.
+
+```haml
+%html
+  %head
+    %title Ruby and Haml example
+    
+  %body
+    %h1 This is the Haml template example
+    
+    %div
+      =show_me
+```
+
 
 ### Python
+
+The Python example is pretty simple too. I use [Pika](https://pika.readthedocs.org/en/0.9.13/intro.html) as the library to access the  message queue.
+
+```python
+import pika
+import json
+
+route_id = "GET/_/py/hello"
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+channel = connection.channel()
+channel.queue_declare(queue=route_id)
+
+print "[Responder ready]"
+
+def callback(ch, method, props, body):
+  if props.app_id == route_id:
+    response = [200, {"Content-Type" : "text/html"}, "<h1>Hello Python!</h1>"]
+    response_json = json.dumps(response)
+    
+    ch.basic_publish(exchange='',
+                     routing_key=props.reply_to,
+                     properties=pika.BasicProperties(correlation_id = props.correlation_id),
+                     body=str(response_json))
+    
+    ch.basic_ack(delivery_tag = method.delivery_tag)
+
+
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(callback, queue=route_id)
+try:
+  channel.start_consuming()
+except KeyboardInterrupt:
+  print "[Responder shutdown]"
+```
 
 
 ### PHP
 
+PHP is straightforward as well, using the [PhpAmqpLib](https://github.com/videlalvaro/php-amqplib) library. Install the library first before running the script.
 
+```php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+$route_id = 'GET/_/php/hello';
+$connection = new AMQPConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection->channel();
+
+$channel->queue_declare($route_id);
+
+echo "[Responder ready]\n";
+
+$callback = function($req){
+  global $route_id;
+  if ($req->get('app_id') == $route_id) {
+    $payload = [
+      "200",
+      ['Content-Type' => 'text/html'],
+      "<h1>Hello PHP!</h1>"
+    ];
+    $json = json_encode($payload);
+
+    $msg = new AMQPMessage(
+        $json,
+        array('correlation_id' => $req->get('correlation_id'), 'content_type' => 'text/html')
+        );
+
+    $req->delivery_info['channel']->basic_publish($msg, '', $req->get('reply_to'));    
+    $req->delivery_info['channel']->basic_ack($req->delivery_info['delivery_tag']);    
+  }
+};
+
+$channel->basic_qos(null, 1, null);
+$channel->basic_consume($route_id, '', false, false, false, false, $callback);
+
+while(count($channel->callbacks)) {
+    $channel->wait();
+}
+
+$channel->close();
+$connection->close();
+echo "[Responder shutdown]", "\n";
+?>
+```
 
 
 ## Extending the default acceptor
