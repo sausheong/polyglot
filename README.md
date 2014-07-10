@@ -79,13 +79,7 @@ The message queue is a generic [AMQP](http://www.amqp.org) message queue, implem
 
 ### Responder
 
-Responders are processing units that can be written in any programming language that can communicate with the message queue. Responders are normally written as standalone processes that wait on the message queue. All responders essentially do the same thing, which is to process incoming requests but there are 3 types of responders that behave slightly differently:
-
-1. First responder -- this is a responder that responds to a message from the acceptor
-2. Final responder -- this is a responder that returns a message to the acceptor
-3. Chained responder -- this is a responder that takes a message from a responder and creates a message to another responder
-
-A responder can be a first and final responder if it responds to a message from the acceptor and returns a message to the same acceptor. 
+Responders are processing units that can be written in any programming language that can communicate with the message queue. Responders are normally written as standalone processes that wait on the message queue. All responders essentially do the same thing, which is to process incoming requests and returns a message to the acceptor. 
 
 
 ## Installation and setup
