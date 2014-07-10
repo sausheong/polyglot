@@ -97,7 +97,6 @@ func process(c *gin.Context) {
     }
   }()  
   response := string(<-ret)
-    
   err = ch.Cancel("send", false)
   failOnError(err, "Failed to cancel channel")   
   

@@ -1,12 +1,7 @@
 require "./polyglot"
 
 class Hello < Polyglot::Responder
-  
-  def initialize
-    super
-    @method, @path = "GET", "haml/hello"
-  end
-  
+
   def respond(json)
     puts json
     haml = Haml::Engine.new(File.read("hello.haml"))
@@ -15,7 +10,7 @@ class Hello < Polyglot::Responder
   end
 end 
 
-responder = Hello.new
+responder = Hello.new("GET/_/ruby/haml")
 responder.run
 
 

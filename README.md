@@ -15,7 +15,6 @@ The answer is **trade-offs**.
 As a programmer you trade-off complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
 
 1. **Performance scalability** -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
-2. **Modularity** -- Polyglot responders can be chained, each doing an individual piece of processing, encouraging reusability of code
 3. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
 4. **Multi-lingual development** -- Polyglot responders can be developed in multiple programming languages, **at the same time**
 
@@ -178,20 +177,17 @@ The default implementation for Ruby responders follow a very simple pattern. Mos
 ```ruby
 require "./polyglot"
 
-class Hello < Polyglot::Responder
-
-  def initialize
-    super
-    @method, @path = "GET", "ruby/hello"
-  end
-
+class Hello < Polyglot::Responder  
   def respond(json)
     html "<h1>Hello Ruby!</h1>"
   end
 end 
 
-responder = Hello.new
+responder = Hello.new("GET/_/ruby/hello")
 responder.run
+
+
+
 ```
 
 Another simple example, using [Haml](http://haml.info/).
@@ -200,12 +196,7 @@ Another simple example, using [Haml](http://haml.info/).
 require "./polyglot"
 
 class Hello < Polyglot::Responder
-  
-  def initialize
-    super
-    @method, @path = "GET", "haml/hello"
-  end
-  
+
   def respond(json)
     puts json
     haml = Haml::Engine.new(File.read("hello.haml"))
@@ -214,8 +205,11 @@ class Hello < Polyglot::Responder
   end
 end 
 
-responder = Hello.new
+responder = Hello.new("GET/_/ruby/haml")
 responder.run
+
+
+
 ```
 
 Here is the haml page.
@@ -239,22 +233,88 @@ require "./polyglot"
 require 'base64'
 
 class Hello < Polyglot::Responder
-  
-  def initialize
-    super
-    @method, @path = "GET", "foo/bar"
-  end
-  
   def respond(json)
     pic = File.read('monalisa.jpg')
     [200, {"Content-Type" => "image/jpeg"}, Base64.encode64(pic)]
   end
 end 
 
-responder = Hello.new
+responder = Hello.new("GET/_/foo/bar")
 responder.run
+
 ```
 
+Here's `polyglot.rb` where the work is done.
+
+```ruby
+require 'bunny'
+require 'json'
+require 'haml'
+require 'base64'
+
+module Polyglot
+  
+  class Responder
+
+    def initialize(id)
+      @route_id = id
+    end
+
+    def run
+      # A route ID uniquely identifies a route that this responder will respond to
+      conn = Bunny.new
+      conn.start
+      ch = conn.create_channel
+      
+      # Set up the queue for the acceptor to add messages to
+      # If the acceptor cannot find a queue with this route ID it will return a 404
+      # Set the queue to auto delete ie if there are no more messages or consumers  
+      # on the queue, it will remove itself
+      q  = ch.queue(@route_id, durable: true, auto_delete: true)
+      exch = ch.default_exchange
+      ch.prefetch(1)
+      puts "[Responder ready]."
+      
+      loop do
+        begin
+          q.subscribe(ack: true, block: true) do |delivery_info, properties, body|
+            # Only respond to this route ID
+            if @route_id == properties[:app_id] then                          
+              response = self.respond(body)        
+              exch.publish(response.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
+              ch.ack(delivery_info.delivery_tag)
+            end
+          end
+        rescue Interrupt => int
+          puts
+          puts "[Responder shutdown]."          
+          exit(0)
+        end
+      end      
+      conn.close
+    end
+
+    
+    # Responders must override this method; by default it will return a 200 OK with 
+    # no message
+    def respond(json)
+      [200, {}, ""]
+    end
+    
+    # Convenience method to return HTML
+    def html(body)
+      [200, {"Content-Type" => "text/html"}, body]
+    end
+    
+    # Convenience method to redirect to the given url
+    def redirect(url)
+      [302, {"Location" => url}, ""]
+    end
+    
+  end
+  
+end
+```
 
 ### Python
 
