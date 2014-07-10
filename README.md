@@ -185,9 +185,6 @@ end
 
 responder = Hello.new("GET/_/ruby/hello")
 responder.run
-
-
-
 ```
 
 Another simple example, using [Haml](http://haml.info/).
@@ -207,9 +204,6 @@ end
 
 responder = Hello.new("GET/_/ruby/haml")
 responder.run
-
-
-
 ```
 
 Here is the haml page.
@@ -241,7 +235,6 @@ end
 
 responder = Hello.new("GET/_/foo/bar")
 responder.run
-
 ```
 
 Here's `polyglot.rb` where the work is done.
@@ -408,6 +401,30 @@ echo "[Responder shutdown]", "\n";
 
 ## Extending the default acceptor
 
+The default acceptor sets up all dynamic routes for the responders after the `/_/` path.
+
+```go
+package main
+
+import "github.com/gin-gonic/gin"
+
+func main() {
+  r := gin.Default()
+  
+  r.GET("/_/*p", process)
+  r.POST("/_/*p", process)
+  
+  r.Run(":8080")
+}
+```
+
+You can add in your own routing, specific to your own application. You can even remove dynamic routing altogether by creating static routes that have hard-coded corresponding responders.
+
+At the same time you can add in other HTTP methods like PUT and DELETE to allow their respective routes, and run it in a different port than 8080.
+
 
 ## Extending an existing application
+
+You can extend an existing web application by creating a controller in your application that emulates whatever the acceptor does (which is essentially to pack the HTTP request into JSON and add it to the queue, then wait for a response and pass it back to the calling client).
+
 
