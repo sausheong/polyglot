@@ -17,24 +17,24 @@ Wouldn't it be nice if we all just learn to live together?
 
 **Polyglot** is a web framework that let us just do that.
 
-Polyglot allows programmers to collaborate and develop web applications using their programming language of choice. And it's not just different programming languages, it's different environments and different versions of the same language, using different libraries. 
+Polyglot allows programmers to collaborate and develop a single web application using multiple programming languages, libraries, environments and even different versions of the same language. 
 
-Literally, Polyglot allows different parts of a web application to be written in different programming languages, versions and using different versions of various libraries.
+What does this mean? 
+
+It means no more programming language wars -- programmers can use the best language for the job and/or their favorite language to write different parts of the same web application.
+
+It also means no dependency hell. Different parts of the same web application can use different libraries. Because of this, adding new features can use new libraries without upgrading the entire library.
 
 
 ### A complex web framework 
 
-So what's the catch? There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
+So what's the catch? There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer. 
 
-So why are we doing this?
-
-The answer is **trade-offs**. 
-
-As a programmer you trade-off complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
+As a programmer you trade complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
 
 1. **Performance scalability** -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
 2. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
-3. **Multi-lingual development** -- Polyglot responders can be developed in multiple programming languages, **at the same time**
+3. **Multi-lingual, independent development** -- Polyglot responders can be developed independently in different programming languages, libraries and environments
 
 *Polyglot* is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
 
