@@ -2,26 +2,43 @@
 
 _Polyglot is experimental software. Please use with caution and at your own risk!_
 
-## What is it?
+## Language wars and dependency hell
 
-Programmers use [web frameworks](http://en.wikipedia.org/wiki/Web_application_framework) to simplify the effort to develop web applications. Web frameworks reduce the overhead of work that needs to be done in most web applications. This reduces time and effort needed, improving stability and creating a consistent and maintainable system. Web application frameworks are written in a single, major programming language, like Ruby with Ruby on Rails, Python with Django, Java with Spring or Javascript with Angular.js. 
+Programming language wars have been going on since the beginning of time. On a given day, there are at least half a dozen of threads on [Hacker News](https://hn.algolia.com/?q=programming+language#!/story/last_24h/0/programming%20language) discussing the merits of or introducing some new programming language. Every programmer has his or her own ideas of what the best programming language is for him or her (and for everyone else too, of course). Which is the fastest, most expressive, most secured, has the smallest code base, easiest to maintain etc? (_Ruby is da best!_)
 
-Polyglot is a web framework that *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
+[Dependency hell](http://en.wikipedia.org/wiki/Dependency_hell) is something most programmers will encounter after a while. Software libraries that your application depend on often get updated. Your application will need to grow too, and might need to use new libraries or new versions of the existing libraries. But wait! You just discovered that you cannot use the new version because another library you use depends on the older version. To upgrade, you'll need to revamp your application to use the new libraries. And of course, by the time you did, it's probably need to upgrade the libraries again.
 
-So what good is that?? 
+Programmers use [web frameworks](http://en.wikipedia.org/wiki/Web_application_framework) to simplify the effort to develop web applications. Web frameworks are software libraries that reduce the overhead of work that needs to be done in most web applications. This reduces time and effort needed, improving stability and creating a consistent and maintainable system. As with any software library, web  frameworks are written in a single, major programming language, like Ruby with Ruby on Rails, Python with Django, Java with Spring or Javascript with Angular.js. Understandably, where web frameworks go, there goes the language wars and dependency hell too. Anyone migrating from a previous version of a web framework to a newer one can attest to the pain this entails. 
+
+Wouldn't it be nice if we all just learn to live together?
+
+
+## Polyglot
+
+**Polyglot** is a web framework that let us just do that.
+
+Polyglot allows programmers to collaborate and develop web applications using their programming language of choice. And it's not just different programming languages, it's different environments and different versions of the same language, using different libraries. 
+
+Literally, Polyglot allows different parts of a web application to be written in different programming languages, versions and using different versions of various libraries.
+
+
+### A complex web framework 
+
+So what's the catch? There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer.
+
+So why are we doing this?
 
 The answer is **trade-offs**. 
 
 As a programmer you trade-off complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
 
 1. **Performance scalability** -- Polyglot responders are distributed and independent processes that can reside anywhere on a connected network
-3. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
-4. **Multi-lingual development** -- Polyglot responders can be developed in multiple programming languages, **at the same time**
-
+2. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
+3. **Multi-lingual development** -- Polyglot responders can be developed in multiple programming languages, **at the same time**
 
 *Polyglot* is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
 
-The first three are understandable, but the fourth is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
+The first two are understandable, but the third is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
 
 1. Web applications you write are systems and they change over time and can be written or maintained by different groups of people. If you're not restricted to a particular platform or language, then the chances of getting an incrementally better piece of software is higher. 
 2. Also, by forcing the deliberate use of different programming languages, you are forced to separate the layers and make each component more independent and robust, being able to switch out the poor-performing responders and replacing them with higher-performing ones
