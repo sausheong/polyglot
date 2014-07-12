@@ -1,7 +1,7 @@
 package main
 
 import (
-  "github.com/gin-gonic/gin"
+  "github.com/julienschmidt/httprouter"
   "github.com/nu7hatch/gouuid"
   "github.com/streadway/amqp"
   "encoding/json"
@@ -9,7 +9,7 @@ import (
   "log"
   "fmt"
   "strings"
-  // "net/http"
+  "net/http"
   // "reflect"
 )
 
@@ -21,15 +21,16 @@ func failOnError(err error, msg string) {
   }
 }
 
-func process(c *gin.Context) {
 
-  c.Req.ParseForm()
-  c.Req.ParseMultipartForm(1024)
+// default handler
+func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+  r.ParseForm()
+  r.ParseMultipartForm(1024)
 
   // marshal the HTTP request struct into JSON
-  req_json, err := json.Marshal(c.Req)
+  req_json, err := json.Marshal(r)
   
-  routeId := c.Req.Method + c.Req.URL.Path
+  routeId := r.Method + r.URL.Path
   failOnError(err, "Failed to marshal the request")  
   
   conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
@@ -41,8 +42,8 @@ func process(c *gin.Context) {
   defer ch.Close()
 
   _, err = ch.QueueInspect(routeId); if err != nil {
-    c.Writer.WriteHeader(404)
-    c.Writer.Write([]byte("Not Found"))
+    w.WriteHeader(404)
+    w.Write([]byte("Not Found"))
     return
   }
 
@@ -104,16 +105,16 @@ func process(c *gin.Context) {
   res := string(response)
   
   // unmarshal JSON into status, headers and body
-  var r interface{}
-  err = json.Unmarshal([]byte(res), &r); if err == nil {
-    response := r.([]interface{})
+  var resp interface{}
+  err = json.Unmarshal([]byte(res), &resp); if err == nil {
+    response := resp.([]interface{})
     status := response[0]
     headers := response[1].(map[string]interface{})
     body := response[2]
 
     // write headers
     for k, v := range headers {
-      c.Writer.Header().Set(k, v.(string))
+      w.Header().Set(k, v.(string))
     }
     s, _ := status.(float64)
     b, _ := body.(string)
@@ -131,7 +132,7 @@ func process(c *gin.Context) {
     }
 
     // write status and body to response
-    c.Writer.WriteHeader(int(s))
-    c.Writer.Write(data)
+    w.WriteHeader(int(s))
+    w.Write(data)
   }
 }

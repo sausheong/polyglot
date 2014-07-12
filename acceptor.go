@@ -1,13 +1,16 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+  "github.com/julienschmidt/httprouter"
+  "net/http"
+)
 
 func main() {
-  r := gin.Default()
+  r := httprouter.New()
   
   r.GET("/_/*p", process)
   r.POST("/_/*p", process)
   
-  r.Run(":8080")
+  http.ListenAndServe(":8080", r)
 }
 
