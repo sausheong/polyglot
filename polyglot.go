@@ -51,7 +51,7 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
   replyq, err := ch.QueueDeclare(
     routeId + ":[r]",    // name
     false,              // durable
-    true,               // delete when unused
+    false,               // delete when unused
     false,              // exclusive
     false,              // noWait
     nil,                // arguments

@@ -4,7 +4,7 @@ import json
 route_id = "GET/_/py/hello"
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
-channel.queue_declare(queue=route_id)
+channel.queue_declare(queue=route_id, durable=True, auto_delete=True)
 
 print "[Responder ready]"
 

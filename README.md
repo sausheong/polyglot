@@ -442,11 +442,66 @@ You can extend an existing web application by creating a controller in your appl
 
 I ran performance testing comparison for a web application that 'works' for 500ms then return "Hello Perf" on:
 
-1. A standalone Ruby Sinatra web app running on Puma with minimum 10 threads, and maximum 50 threads
-2. A standalone Go web app using standard libraries
+1. A standalone Ruby Sinatra web app running on Puma with minimum 10 threads, and maximum 100 threads
+2. A standalone Go web app using standard libraries (Go spins goroutines whenever necessary)
 3. A Polyglot web app with 50 Ruby responders on the same machine, and another 50 responders on a separate machine
 
+The test used [httperfrb](https://github.com/jmervine/httperfrb) which is a wrapper around [httperf](http://www.hpl.hp.com/research/linux/httperf/). Starting from 10, with interval steps of 10 until it hits 1000, httperf sends out n number of requests at the same time. This means httperf will start with sending 10 requests to the web app at the same time, and sends 10 more each time, until it ends the test with sending 1000 requests to the web app at the same time.
+
+The results are in the `perf` folder.
+
 Here are the results:
+
+#### Connection rate
+
+This is the number of connections per second that the web app can take.
+
+![connection rate](perf/connection_rate_per_sec.png)
+
+The standalone Go web app's performance is amazing, going linearly until it hits around 460 connections per second at around 700 requests sent at the same time. However, as you can see later, the Go web app breaks soon after and returns success erratically.
+
+The Puma web app's performance is smooth all the way, but tapers at around 175 connections per second, keeping steady until the end. The Polyglot web app's performance follows closely that of the Puma web app's.
+
+#### Connection average time
+
+This shows the average for the time taken between a successful connection initiation until the time the connection is closed.
+
+~[connection time average](perf/connection_time_avg.png)
+
+The standalone Go web app's connection average time is very stable and consistent, all the way until it breaks, staying around slightly more than 500ms. This is to be expected -- remember that the 'work' time is actually 500ms! Anything less is going to mean that the web app is broken.
+
+Both the Puma and Polyglot web app scales well, with the Puma web app doing slightly better.
+
+#### Total test duration
+
+This shows how long it took for the tests to run. 
+
+![total test duration](perf/total_test_duration.png)
+
+The standlone Go web app's duration stayed steady most of the time around 1.5s. The Puma and Polyglot web apps again, scaled linearly pretty smoothly, mirroring each other's step.
+
+#### Successful replies
+
+![successful replies](perf/reply_status_2xx.png)
+
+This chart shows only the Polyglot web app because the Puma web app's line is totally covered by the Polyglot web app. The scaling is completely linear, meaning every request is successfully replied all the way to 1000 requests. On the other hand, the Go web app broke around 700+ requests, rendering all subsequent results unreliable.
+
+
+### Summary of test results
+
+From the test results it seems that the Go web app performed amazingly, and has consistent performance all the way till around 700+ requests sent concurrently. Note that the tests are not done very rigorously -- there could very well be some other factors affecting this result.
+
+The Puma web app on the other hand, chugged away admirably, scaling well and never missed a beat all the way up to 1000 requests.
+
+The Polyglot web app mirrored the Puma web app's performance, lagging slightly. This is to be expected as the both the Puma web app and the Polyglot responders are using the same programming language -- Ruby. However note that Polyglot performance actually includes a message queue overhead, and the fact that 50% of the Polyglot web app's responders were actually in another server!
+
+The advantage of Polyglot as you might guess, is that you can scale a lot more massively in many servers while the Puma web app can only run threads in a single server. Also, with a faster language, we can probably increase the performance as well.
+
+
+
+
+
+
 
 
 
