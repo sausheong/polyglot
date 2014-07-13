@@ -462,6 +462,8 @@ The standalone Go web app's performance is amazing, going linearly until it hits
 
 The Puma web app's performance is smooth all the way, but tapers at around 175 connections per second, keeping steady until the end. The Polyglot web app's performance follows closely that of the Puma web app's.
 
+Remember that we have 100 threads in the Puma web app, and 100 responders for the Polyglot web app. With more web apps, the connection rate should go up as well.
+
 #### Connection average time
 
 This shows the average for the time taken between a successful connection initiation until the time the connection is closed.
@@ -489,20 +491,11 @@ This chart shows only the Polyglot web app because the Puma web app's line is to
 
 ### Summary of test results
 
-From the test results it seems that the Go web app performed amazingly, and has consistent performance all the way till around 700+ requests sent concurrently. Note that the tests are not done very rigorously -- there could very well be some other factors affecting this result.
+From the test results it seems that the Go web app performed amazingly, and has consistent performance all the way till around 700+ requests sent concurrently. This is somewhat expected -- Go spins up new goroutines to handle every request whereas we have 100 threads in the Puma web app and 100 responders for Polyglot. 
 
 The Puma web app on the other hand, chugged away admirably, scaling well and never missed a beat all the way up to 1000 requests.
 
-The Polyglot web app mirrored the Puma web app's performance, lagging slightly. This is to be expected as the both the Puma web app and the Polyglot responders are using the same programming language -- Ruby. However note that Polyglot performance actually includes a message queue overhead, and the fact that 50% of the Polyglot web app's responders were actually in another server!
+The Polyglot web app mirrored the Puma web app's performance, lagging behind only slightly. This is to be expected as the both the Puma web app and the Polyglot responders are using the same programming language -- Ruby. However note that Polyglot performance actually includes a message queue overhead, and the fact that 50% of the Polyglot web app's responders were actually in another server!
 
 The advantage of Polyglot as you might guess, is that you can scale a lot more massively in many servers while the Puma web app can only run threads in a single server. Also, with a faster language, we can probably increase the performance as well.
-
-
-
-
-
-
-
-
-
 
