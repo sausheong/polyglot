@@ -466,7 +466,7 @@ The Puma web app's performance is smooth all the way, but tapers at around 175 c
 
 This shows the average for the time taken between a successful connection initiation until the time the connection is closed.
 
-~[connection time average](perf/connection_time_avg.png)
+![connection time average](perf/connection_time_avg.png)
 
 The standalone Go web app's connection average time is very stable and consistent, all the way until it breaks, staying around slightly more than 500ms. This is to be expected -- remember that the 'work' time is actually 500ms! Anything less is going to mean that the web app is broken.
 
