@@ -438,4 +438,16 @@ At the same time you can add in other HTTP methods like PUT and DELETE to allow 
 
 You can extend an existing web application by creating a controller in your application that emulates whatever the acceptor does (which is essentially to pack the HTTP request into JSON and add it to the queue, then wait for a response and pass it back to the calling client).
 
+## Performance comparison
+
+I ran performance testing comparison for a web application that 'works' for 500ms then return "Hello Perf" on:
+
+1. A standalone Ruby Sinatra web app running on Puma with minimum 10 threads, and maximum 50 threads
+2. A standalone Go web app using standard libraries
+3. A Polyglot web app with 50 Ruby responders on the same machine, and another 50 responders on a separate machine
+
+Here are the results:
+
+
+
 
