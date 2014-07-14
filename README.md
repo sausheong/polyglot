@@ -170,7 +170,7 @@ If you want to run this in production, use Foreman to export out the configurati
 
 Writing responders are quite easy. There are basically only a few steps to follow:
 
-1. Set up the route ID. This is basically the HTTP method followed by `/_/` and then the route path. For example, if you want to set up a responder for a GET request going to the route `/_/hello` then set up the route ID to be `GET/_/hello`
+1. Set up the route ID. This is basically the HTTP method followed by `/_/` and then the route path. For example, if you want to set up a responder for a GET request going to the route `hello` then set up the route ID to be `GET/_/hello`
 2. Connect to the message queue using whichever AMQP library the language has
 3. Consume a queue with the name of the route ID. Whenever a request is sent to the acceptor, your responder will receive a JSON formatted message which essentially contains the HTTP request details
 4. Check if the message's `app_id` matches the route ID. If it does, then you should process the message, otherwise you should ignore it
