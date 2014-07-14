@@ -86,7 +86,7 @@ The chained flow goes like this:
 
 ### Acceptor
 
-The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go, using the [Gin framework](http://gin-gonic.github.io/gin/) (yes, the irony of implementing a framework with another framework). The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
+The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go. The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
 
 You can also extend an existing application by creating a controller in that application as an acceptor. 
 

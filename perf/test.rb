@@ -7,6 +7,7 @@ results = {}
   perf = HTTPerf.new "port" => 8080, "uri" => "/perf", "num-conns" => num_connections, "rate" => num_connections
   perf.parse = true  
   results[num_connections] =  perf.run    
+  p results[num_connections]
   puts "#{num_connections} - #{results[num_connections][:total_test_duration]}s"
 end
 
