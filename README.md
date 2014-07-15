@@ -36,14 +36,14 @@ As a programmer you trade complexity and effort for something you think is more 
 2. **Extensibility** -- by creating an acceptor as a controller in an existing web application, you can extend the applications through Polyglot
 3. **Multi-lingual, independent development** -- Polyglot responders can be developed independently in different programming languages, libraries and environments
 
-*Polyglot* is not for all types of web applications. You should only use Polyglot for web applications that need to be scale in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either. 
+*Polyglot* is not for all types of web applications. You should only use Polyglot for web applications that need to be scaled in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web application never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web application and you or anyone else never need to add new features, Polyglot is probably not for you either.
 
 The first two are understandable, but the third is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
 
 1. Web applications you write are systems and they change over time and can be written or maintained by different groups of people. If you're not restricted to a particular platform or language, then the chances of getting an incrementally better piece of software is higher. 
-2. Also, using different programming languages allows you to separate the layers and make each component more independent and robust. You can switch out the poor-performing responders and replacing them with higher-performing ones
+2. Also, using different programming languages allows you to separate the layers and make each component more independent and robust. You can switch out the poor-performing responders and replace them with higher-performing ones.
 3. Different responders can have different criteria for performance, ease-of-development, ease-of-maintenance or quick turnaround in development. With a single programming language you are often forced to accept a compromise. With multiple programming languages, you can choose the platform and language as what you need for that particular responder
-4. Different responders can be written for specific performance gains or maintenability.
+4. Different responders can be written for specific performance gains or maintainability.
 
 
 Is Polyglot for your web application? 
@@ -86,7 +86,7 @@ The chained flow goes like this:
 
 ### Acceptor
 
-The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation a simple web application written in Go. The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor. 
+The acceptor is a communications unit that interacts with the external world (normally a browser). The default implementation is a simple web application written in Go. The acceptor is sessionless and main task is to accept requests and push them into the message queue, then receives the response and reply to the requestor.
 
 You can also extend an existing application by creating a controller in that application as an acceptor. 
 
