@@ -448,6 +448,8 @@ I ran performance testing comparison for a web application that 'works' for 500m
 
 The test used [httperfrb](https://github.com/jmervine/httperfrb) which is a wrapper around [httperf](http://www.hpl.hp.com/research/linux/httperf/). Starting from 10, with interval steps of 10 until it hits 1000, httperf sends out n number of requests at the same time. This means httperf will start with sending 10 requests to the web app at the same time, and sends 10 more each time, until it ends the test with sending 1000 requests to the web app at the same time.
 
+I used 2 Ubuntu 14.04 VN instances, server A with 30 GB RAM, running the web applications, and server B with 6GB RAM running httperf. For Polyglot, 50 responders run on server A and another 50 run on server B.
+
 The detailed data of the test is in the `perf` directory. The following is an interpretation of the data.
 
 #### Connection rate
