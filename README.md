@@ -41,7 +41,7 @@ As a programmer you trade complexity and effort for something you think is more 
 The first two are understandable, but the third is quite strange, why would you want to develop a web application in multiple programming languages? There are good, practical reasons:
 
 1. Web applications you write are systems and they change over time and can be written or maintained by different groups of people. If you're not restricted to a particular platform or language, then the chances of getting an incrementally better piece of software is higher. 
-2. Also, by forcing the deliberate use of different programming languages, you are forced to separate the layers and make each component more independent and robust, being able to switch out the poor-performing responders and replacing them with higher-performing ones
+2. Also, using different programming languages allows you to separate the layers and make each component more independent and robust. You can switch out the poor-performing responders and replacing them with higher-performing ones
 3. Different responders can have different criteria for performance, ease-of-development, ease-of-maintenance or quick turnaround in development. With a single programming language you are often forced to accept a compromise. With multiple programming languages, you can choose the platform and language as what you need for that particular responder
 4. Different responders can be written for specific performance gains or maintenability.
 
@@ -448,9 +448,7 @@ I ran performance testing comparison for a web application that 'works' for 500m
 
 The test used [httperfrb](https://github.com/jmervine/httperfrb) which is a wrapper around [httperf](http://www.hpl.hp.com/research/linux/httperf/). Starting from 10, with interval steps of 10 until it hits 1000, httperf sends out n number of requests at the same time. This means httperf will start with sending 10 requests to the web app at the same time, and sends 10 more each time, until it ends the test with sending 1000 requests to the web app at the same time.
 
-The results are in the `perf` folder.
-
-Here are the results:
+The detailed data of the test is in the `perf` directory. The following is an interpretation of the data.
 
 #### Connection rate
 
