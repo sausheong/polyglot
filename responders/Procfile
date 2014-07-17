@@ -1,4 +1,4 @@
 hello_ruby: ruby -C ./ruby hello.rb
-hello_php: php ./php/hello.php
 hello_py: python ./python/hello.py
+hello_go: ./go-resp/go-resp
 foo_ruby: ruby -C ./ruby foo.rb
