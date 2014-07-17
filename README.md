@@ -1,6 +1,6 @@
 # Polyglot
 
-_Polyglot is experimental software. Please use with caution and at your own risk!_
+_Polyglot is experimental software and is a prototype implementation of an idea at the moment. Please use with caution and at your own risk!_
 
 ## Language wars and dependency hell
 
@@ -179,7 +179,14 @@ Writing responders are quite easy. There are basically only a few steps to follo
     2. A hash/map/dictionary of headers. You should try to put in at least the 'Content-Type' header
     3. The HTTP response body. This must be a string
 
-The examples below shows how this can be done in various languages.
+The examples below shows how this can be done in various languages. The full list of responders are in the responders directory, including sample (Hello World type) responders for:
+
+* Ruby
+* Python
+* PHP
+* Go
+
+Please send pull requests for sample responders in other languages!
 
 ### Ruby
 
@@ -499,3 +506,8 @@ The Polyglot web app mirrored the Puma web app's performance, lagging behind onl
 
 The advantage of Polyglot as you might guess, is that you can scale a lot more massively in many servers while the Puma web app can only run threads in a single server. Also, with a faster language, we can probably increase the performance as well.
 
+## Credits and feedback
+
+The idea of separating the request acceptor and the workload has been around for a while, in particular the enterprise world has been doing [Service Oriented Architecture](http://en.wikipedia.org/wiki/Service-oriented_architecture) for a while, as with [Message-oriented middleware(MOM)](http://en.wikipedia.org/wiki/Message-oriented_middleware). Task queues where you have clients and workers is also a common pattern used in many systems. The idea of returning an array of status, headers and body was inspired by [WSGI](http://wsgi.readthedocs.org/en/latest/).
+
+There is also feedback that Polyglot is similar to [Mongrel2](http://mongrel2.org/). I'm not familiar with Mongrel2, and a preliminary reading tells me that it sounds like fantastic software.
