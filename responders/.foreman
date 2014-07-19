@@ -1,5 +1,2 @@
 concurrency: 
-  hello_ruby=5,
-  hello_py=5,
-  hello_go=5,
-  foo_ruby=5  
+  hello_go=100  

@@ -11,6 +11,6 @@ func main() {
   r.GET("/_/*p", process)
   r.POST("/_/*p", process)
   
-  http.ListenAndServe(":8080", r)
+  http.ListenAndServe("0.0.0.0:8080", r)
 }
 

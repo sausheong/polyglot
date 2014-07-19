@@ -31,7 +31,7 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
   req_json, err := json.Marshal(r)
   
   routeId := r.Method + r.URL.Path
-  fmt.Println(routeId)
+  // fmt.Println(routeId)
   failOnError(err, "Failed to marshal the request")  
   
   conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
@@ -45,7 +45,7 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
   _, err = ch.QueueInspect(routeId); if err != nil {
     w.WriteHeader(404)
     w.Write([]byte("Not Found"))
-    fmt.Println(" - Not Found")
+    // fmt.Println(" - Not Found")
     return
   }
 
@@ -80,7 +80,7 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
       AppId:         routeId,
     })
   failOnError(err, "Failed to publish a message")  
-  fmt.Println(" - published to queue")
+  // fmt.Println(" - published to queue")
   // wait to receive 
   msgs, err := ch.Consume(
     replyq.Name,     // queue
@@ -132,7 +132,7 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     } else {
       data, _ = base64.StdEncoding.DecodeString(b)
     }
-    fmt.Println(" -", status)
+    // fmt.Println(" -", status)
     // write status and body to response
     w.WriteHeader(int(s))
     w.Write(data)

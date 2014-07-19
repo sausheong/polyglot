@@ -4,6 +4,7 @@ import (
   "github.com/streadway/amqp"
   "log"
   "fmt"
+  "time"
 )
 
 func failOnError(err error, msg string) {
@@ -39,7 +40,7 @@ func main() {
   
   println("[Responder ready.]")
   
-  // ret := make(chan []byte)
+  ret := make(chan []byte)
   cor := make(chan string)
   rep := make(chan string)
   aid := make(chan string)
@@ -60,18 +61,19 @@ func main() {
     go func() {
       for d := range deliveries {
         d.Ack(true)
-        // ret <- d.Body
+        ret <- d.Body
         cor <- d.CorrelationId
         rep <- d.ReplyTo
         aid <- d.AppId
       }
     }()  
-    // response := string(<-ret) 
+    response := string(<-ret)
     corrId := string(<-cor)
     replyTo := string(<-rep)  
     appId := string(<-aid)
     
     if routeId == appId {
+      time.Sleep(500 * time.Millisecond)
       err = ch.Publish(
         "",         // default exchange
         replyTo,    // routing key
@@ -86,7 +88,7 @@ func main() {
         })
       failOnError(err, "Failed to publish a message")    
     
-      // fmt.Println("Response:", response)
+      fmt.Println("Response:", response)
      
       err = ch.Cancel("process", true)
       failOnError(err, "Failed to cancel channel")          
