@@ -76,7 +76,7 @@ The chained flow goes like this:
 1. Client sents a HTTP request to the acceptor
 2. The acceptor converts the request into JSON and adds the JSON message into the message queue, and waits for a response
 3. A responder detects the message and starts processing it
-4. Once the responder completes processing, it will send a create another message on the queue for another responder to process, then waits for a response
+4. Once the responder completes processing, it will create another message and add it into the queue for another responder to process, then waits for a response
 5. This results in a chain of responders
 6. Once the final responder completes processing, the results are gathered and rolled back to the first responder
 7. The first responder adds a response message back to the message queue, with the correlation ID set to the same ID that was sent as part of the request message
