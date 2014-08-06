@@ -10,6 +10,7 @@ import (
   "fmt"
   "strings"
   "net/http"
+  "os"
   // "reflect"
 )
 
@@ -34,7 +35,12 @@ func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
   // fmt.Println(routeId)
   failOnError(err, "Failed to marshal the request")  
   
-  conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+  amqp_host := os.Getenv("AMQP_HOST")
+  if amqp_host == "" {
+    amqp_host = "amqp://guest:guest@localhost:5672/"
+  }
+  
+  conn, err := amqp.Dial(amqp_host)
   failOnError(err, "Failed to connect to RabbitMQ")
   defer conn.Close()
 
