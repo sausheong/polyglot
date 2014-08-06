@@ -131,6 +131,7 @@ Once you have installed RabbitMQ, you can start up the queue with this:
 
     rabbitmq-server
 
+Polyglot will look for a RabbitMQ server connection URL in the environment variable `AMQP_HOST`, and if not found will default to `amqp://guest:guest@localhost:5672/`.
 
 ### Responder
 
