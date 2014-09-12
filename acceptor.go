@@ -15,7 +15,6 @@ func main() {
   router.GET("/_/*p", process)
   router.POST("/_/*p", process)
   
-  
   server := &http.Server{
     Addr:           config.Acceptor,
     Handler:        router,
