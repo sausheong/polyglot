@@ -1,3 +1,5 @@
+# NOTE: The README is completely out of date pending the switch from RabbitMQ to ZMQ
+
 # Polyglot
 
 _Polyglot is experimental software and is a prototype implementation of an idea at the moment. Please use with caution and at your own risk!_
