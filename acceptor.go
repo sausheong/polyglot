@@ -1,16 +1,29 @@
 package main
 
 import (
-  "github.com/julienschmidt/httprouter"
+  "fmt"
   "net/http"
+  "time"
+  "github.com/julienschmidt/httprouter"  
 )
 
 func main() {
-  r := httprouter.New()
+  fmt.Println("Polyglot Acceptor v0.1")
+  fmt.Println("")
+  router := httprouter.New()
   
-  r.GET("/_/*p", process)
-  r.POST("/_/*p", process)
+  router.GET("/_/*p", process)
+  router.POST("/_/*p", process)
   
-  http.ListenAndServe(":8080", r)
+  
+  server := &http.Server{
+    Addr:           config.Acceptor,
+    Handler:        router,
+    ReadTimeout:    time.Duration(config.ReadTimeout * int64(time.Second)),
+    WriteTimeout:   time.Duration(config.WriteTimeout * int64(time.Second)),
+    MaxHeaderBytes: 1 << 20,
+  }
+  server.ListenAndServe()  
+
 }
 

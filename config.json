@@ -1,0 +1,8 @@
+{
+  "Acceptor"       : ":8080",
+  "ReadTimeout"    : 10,
+  "WriteTimeout"   : 600,
+  "RequestTimeout" : 2500,
+  "RequestRetries" : 3,
+  "Broker"         : "tcp://localhost:1234"
+}

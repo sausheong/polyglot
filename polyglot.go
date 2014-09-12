@@ -1,138 +1,138 @@
 package main
 
-import (
-  "github.com/julienschmidt/httprouter"
-  "github.com/nu7hatch/gouuid"
-  "github.com/streadway/amqp"
+import (  
   "encoding/json"
   "encoding/base64"
-  "log"
   "fmt"
   "strings"
+  "strconv"
   "net/http"
-  // "reflect"
+  
+  "github.com/julienschmidt/httprouter"
+  zmq "github.com/pebbe/zmq4"
 )
 
 
-func failOnError(err error, msg string) {
-  if err != nil {
-    log.Fatalf("%s: %s", msg, err)
-    panic(fmt.Sprintf("%s: %s", msg, err))
+// default handler
+func process(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+  if request.Method == "POST" {
+    err := request.ParseForm()
+    failOnError(err, "Failed to parse form")
+    err = request.ParseMultipartForm(10485760)
+    failOnError(err, "Failed to parse multipart form")    
   }
+  
+  // marshal the HTTP request struct into JSON
+  reqJson, err := json.Marshal(request)
+  failOnError(err, "Failed to marshal the request into JSON")
+  
+  routeId := request.Method + request.URL.Path
+
+  // send request
+  // create ZMQ REQ socket
+	client, err := zmq.NewSocket(zmq.REQ)
+  failOnError(err, "Failed to create socket")
+  defer client.Close()
+  
+  // set the identity to the route ID eg GET/_/path
+  client.SetIdentity(routeId)
+	client.Connect(config.Broker)
+
+	poller := zmq.NewPoller()
+	poller.Add(client, zmq.POLLIN)
+
+	retries_left := config.RequestRetries
+  RETRIES_LOOP:
+	for retries_left > 0 {
+		//  We send a request, then we work to get a reply
+		client.SendMessage(reqJson)
+
+    
+		for expect_reply := true; expect_reply; {
+			//  Poll socket for a reply, with timeout
+			sockets, err := poller.Poll(config.Timeout()); if err != nil {
+          reply(writer, 500, []byte(err.Error()))
+          retries_left = 0
+          break RETRIES_LOOP
+        }
+      
+      // if there is a reply
+			if len(sockets) > 0 {
+				response, err := client.RecvMessage(0); if err != nil {
+          reply(writer, 500, []byte(err.Error()))
+          retries_left = 0
+          break RETRIES_LOOP
+				}
+				info(response[0])
+
+        status := response[0] // HTTP response code eg 200, 404
+        headers_json := response[1] // JSON encoded HTTP response headers
+        body := response[2] // HTTP response body as a string
+
+        // // unmarshal header JSON
+        var headers map[string]string
+        err = json.Unmarshal([]byte(headers_json), &headers); if err != nil {
+          reply(writer, 500, []byte(err.Error()))
+          retries_left = 0
+          break RETRIES_LOOP
+        }
+ 
+        // write headers
+        for k, v := range headers {
+          writer.Header().Set(k, v)
+        }
+        s, err := strconv.Atoi(status); if err != nil {
+          reply(writer, 500, []byte(err.Error()))
+          retries_left = 0
+          break RETRIES_LOOP
+        }
+        
+
+        var data []byte
+        // get content type
+        ctype, hasCType := headers["Content-Type"]; if hasCType == true {
+          if strings.HasPrefix(ctype, "text") {
+            data = []byte(body)
+          } else {
+            data, _ = base64.StdEncoding.DecodeString(body)
+          }
+        } else {
+          data, _ = base64.StdEncoding.DecodeString(body)
+        }
+
+        // write status and body to response
+        reply(writer, s, data)
+
+				retries_left = 0
+				expect_reply = false
+
+      // if there are no replies, try again  
+			} else {
+				retries_left--
+				if retries_left == 0 {
+          reply(writer, 500, []byte("Cannot connect with broker, giving up."))
+					break
+				} else {
+					fmt.Println("Cannot reach broker, retrying...")
+					//  Old socket is confused; close it and open a new one
+					client.Close()
+					client, err = zmq.NewSocket(zmq.REQ)
+          failOnError(err, "Failed to create socket")
+          defer client.Close()
+          client.SetIdentity(routeId)
+					client.Connect(config.Broker)
+					// Recreate poller for new client
+					poller = zmq.NewPoller()
+					poller.Add(client, zmq.POLLIN)
+					//  Send request again, on new socket
+					client.SendMessage(reqJson)
+				}
+			}
+		}
+	}
 }
 
-
-// default handler
-func process(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-  r.ParseForm()
-  r.ParseMultipartForm(1024)
-
-  // marshal the HTTP request struct into JSON
-  req_json, err := json.Marshal(r)
-  
-  routeId := r.Method + r.URL.Path
-  failOnError(err, "Failed to marshal the request")  
-  
-  conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-  failOnError(err, "Failed to connect to RabbitMQ")
-  defer conn.Close()
-
-  ch, err := conn.Channel()
-  failOnError(err, "Failed to open a channel")
-  defer ch.Close()
-
-  _, err = ch.QueueInspect(routeId); if err != nil {
-    w.WriteHeader(404)
-    w.Write([]byte("Not Found"))
-    return
-  }
-
-  // declare the response queue used to receive responses from the responders
-  replyq, err := ch.QueueDeclare(
-    routeId + ":[r]",    // name
-    false,              // durable
-    false,               // delete when unused
-    false,              // exclusive
-    false,              // noWait
-    nil,                // arguments
-  )
-  
-  // assert type of the body
-  body := req_json
-  
-  // publish the request into the polyglot queue
-  corrId, _ := uuid.NewV4()
-
-  
-  err = ch.Publish(
-    "",         // default exchange
-    routeId,    // routing key
-    false,      // mandatory
-    false,
-    amqp.Publishing {
-      DeliveryMode:  amqp.Persistent,
-      ContentType:   "application/json",
-      CorrelationId: corrId.String(),
-      ReplyTo:       replyq.Name,
-      Body:          []byte(body),
-      AppId:         routeId,
-    })
-  failOnError(err, "Failed to publish a message")  
-
-  // wait to receive 
-  msgs, err := ch.Consume(
-    replyq.Name,     // queue
-    "process",       // consumer
-    true,            // auto acknowledge
-    false,           // exclusive
-    false,           // no local
-    false,           // no wait
-    nil,             // table
-  )
-  failOnError(err, "Failed to consume message")
-  
-  ret := make(chan []byte)
-  go func() {
-    for d := range msgs {
-      ret <- d.Body
-    }
-  }()  
-  response := string(<-ret)
-  err = ch.Cancel("send", false)
-  failOnError(err, "Failed to cancel channel")   
-  
-  // get response JSON array 
-  res := string(response)
-  
-  // unmarshal JSON into status, headers and body
-  var resp interface{}
-  err = json.Unmarshal([]byte(res), &resp); if err == nil {
-    response := resp.([]interface{})
-    status := response[0]
-    headers := response[1].(map[string]interface{})
-    body := response[2]
-
-    // write headers
-    for k, v := range headers {
-      w.Header().Set(k, v.(string))
-    }
-    s, _ := status.(float64)
-    b, _ := body.(string)
-    var data []byte
-    
-    // get content type    
-    ctype, hasCType := headers["Content-Type"].(string); if hasCType == true {
-      if strings.HasPrefix(ctype, "text") {
-        data = []byte(b)
-      } else {
-        data, _ = base64.StdEncoding.DecodeString(b)
-      }
-    } else {
-      data, _ = base64.StdEncoding.DecodeString(b)
-    }
-
-    // write status and body to response
-    w.WriteHeader(int(s))
-    w.Write(data)
-  }
+func reply(writer http.ResponseWriter, status int, body []byte) {
+  writer.WriteHeader(status)
+  writer.Write(body)
 }
