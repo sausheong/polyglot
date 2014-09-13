@@ -171,12 +171,13 @@ The examples below shows how this can be done in various languages. The full lis
 
 * Ruby
 * Go
+* Python
 
 Please send pull requests for sample responders in other languages!
 
 ### Ruby
 
-This example returns a "Hello World" back to the browser.
+This example uses the [ffi-rzmq](https://github.com/chuckremes/ffi-rzmq) gem and returns a "Hello World" back to the browser.
 
 ```ruby
 require 'securerandom'
@@ -208,14 +209,14 @@ end
 
 ### Go
 
-This example returns the request (in JSON) to the browser.
+This example uses [Go ZMQ4 bindings](https://github.com/pebbe/zmq4) and returns the request (in JSON) to the browser.
 
 ```go
 package main
 
 import (
-	zmq "github.com/pebbe/zmq4"
-	"fmt"
+  zmq "github.com/pebbe/zmq4"
+  "fmt"
   "code.google.com/p/go-uuid/uuid"
 )
 
@@ -275,6 +276,7 @@ while True:
   response = [routeid, "200", "{\"Content-Type\": \"text/html\"}", "Hello World"]
   responder.send_multipart(response)
 ```
+
 
 ## Extending an existing application
 
