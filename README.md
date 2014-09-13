@@ -1,6 +1,6 @@
 # Polyglot
 
-_Polyglot is experimental software and is a prototype implementation of an idea at the moment. Please use with caution and at your own risk!_
+_Polyglot is experimental and incomplete at the moment. Please use with caution and at your own risk!_
 
 ## Language wars and dependency hell
 
@@ -15,7 +15,7 @@ Wouldn't it be nice if we all just learn to live together?
 
 ## Polyglot
 
-**Polyglot** is a web framework to help us just do that.
+**Polyglot** is a web framework to help us get away from all that.
 
 Polyglot allows programmers to collaborate and develop a single web application using multiple programming languages, libraries, environments and even different versions of the same language. 
 
@@ -23,12 +23,12 @@ What does this mean?
 
 It means no more programming language wars -- programmers can use the best language for the job and/or their favorite language to write different parts of the same web application.
 
-It also means no dependency hell. Different parts of the same web application can use different libraries. Because of this, adding new features can use new libraries without upgrading the entire library.
+It can also mean no dependency hell. Different parts of the same web application can use different libraries. Because of this, adding new features can use new libraries without upgrading the entire library.
 
 
 ### A complex web framework 
 
-So what's the catch? There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer. 
+So what's the catch? There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web applications. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer. In fact it adds the complexity of the application, not only in the deployment but also in the development. 
 
 As a programmer you trade complexity and effort for something you think is more important for the web application you're creating. In Polyglot, we are trading complexity and effort for:
 
@@ -53,7 +53,7 @@ Is Polyglot for your web application?
 Polyglot has a very simple and basic architecture. It consists of 3 main components:
 
 1. **Acceptor** - the acceptor is a HTTP interface that takes in a HTTP request and provides a HTTP response. The acceptor takes in a HTTP request converts it into messages and sends it to the Polyglot Broker. Then depending on what is asked, it will return the appropriate HTTP response. The default implementation of the acceptor is in Go. To extend an existing web application, you can also optionally implement the acceptor as a controller in that web application.
-2. **Broker** - the broker is an imtermediary that receives the messages that represent the HTTP request and forwards it to the corresponding responder. 
+2. **Broker** - the broker is an intermediary that receives the messages that represent the HTTP request and forwards it to the corresponding responder. 
 3. **Responder** - responders are standalone processes written in any language that receives messages from the broker and responds to it accordingly. In most web frameworks this is usually called the controller. However unlike most web framework controllers, the responders are actual independent processes that can potentially sit in any connected remote server. Responders contain the "business logic" of your code. 
 
 ![Architecture](doc_images/architecture.jpg "Polyglot architecture")
@@ -61,10 +61,6 @@ Polyglot has a very simple and basic architecture. It consists of 3 main compone
 Essentially, the Polyglot architecture revolves around using a broker to disassociate the processing units (responders) from the communications unit (acceptor), allowing the responders to be created in multiple languages.
 
 ###Flow
-
-There are two basic types of flows in Polyglot.
-
-The normal flow goes like this:
 
 1. Client sents a HTTP request to the acceptor
 2. The acceptor converts the request into JSON and sends it to the broker, and waits for a response
@@ -270,6 +266,10 @@ Then run it like this:
    ./polyadm
    
 There is limited functionality at the moment.
+
+## Current limitations
+
+Polyglot is currently pretty limited. While it can do all of the above, some normally expected capabilities of a web framework are not easily achieved (yet), including (but not limited to) session management and authentication. 
 
 
 ## Credits and feedback
