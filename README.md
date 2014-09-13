@@ -119,7 +119,7 @@ This should create a program called `broker`. To run the broker:
 
     ./broker
 
-The broker creates a log file called `broker.log` that shows the broker's activities. 
+The broker creates a log file called `broker.log` that shows the broker's activities. There is a command line admin tool called `polyadm` in the `polyadm` directory.
 
 
 ### Responder
@@ -147,10 +147,11 @@ To start all the responders at once:
 
     foreman start
     
-**Foreman is used for development and testing purposes only**. If you want to run this in production, use Foreman to export out the configuration files in Upstart or launchd etc. If you want to run this in the background without being cut off when you log out:
+If you want to run this in the background without being cut off when you log out:
 
     nohup foreman start &
-
+    
+**Foreman is used for development and testing purposes only**. If you want to run this in production, use Foreman to export out the configuration files in Upstart or launchd etc. Foreman should not be used in production.
 
 ## Writing responders
 
