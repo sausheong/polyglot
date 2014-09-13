@@ -3,5 +3,6 @@ polyglot
 broker/broker
 cladmin/cladmin
 responders/goresp/goresp
+*.lock
 *.log
 

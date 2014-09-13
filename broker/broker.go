@@ -104,6 +104,7 @@ LOOP:
           }
           responders[routeid] = append(responders[routeid], identity)
           info("Added new responder", identity, "to route:", routeid)
+          fmt.Println("Added new responder", identity, "to route:", routeid)
           info("There are now", len(responders[routeid]), "in the route", routeid)
         }
 
