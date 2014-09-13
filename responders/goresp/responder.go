@@ -3,7 +3,6 @@ package main
 import (
 	zmq "github.com/pebbe/zmq4"
 	"fmt"
-	"crypto/rand"
   "code.google.com/p/go-uuid/uuid"
 )
 
