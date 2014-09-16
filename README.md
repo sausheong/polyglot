@@ -279,6 +279,25 @@ while True:
 ```
 
 
+## Static files
+
+To serve out static files, configure Polyglot to point to a directory you wish to serve the files from. For eg if you want to serve your files from the directory `public` you can change the settings in `config.json` like this:
+
+```javascript
+{
+  "Acceptor"       : ":8080",
+  "ReadTimeout"    : 10,
+  "WriteTimeout"   : 600,
+  "RequestTimeout" : 2500,
+  "RequestRetries" : 3,
+  "Broker"         : "tcp://localhost:1234",
+  "Static"         : "public"
+}
+```
+
+All files (including files in the various subdirectories) can now be served from `http://<host>:8080/_static/` eg if you have a file `public/css/main.css` then you can access the file through `http://<host>:8080/_static/css/main.css`
+  
+
 ## Extending an existing application
 
 You can extend an existing web application by creating a controller in your application that emulates whatever the acceptor does (which is essentially to pack the HTTP request into JSON and send it to the broker, then wait for a response and pass it back to the calling client).

@@ -16,6 +16,7 @@ type Configuration struct {
   RequestTimeout  int64
   RequestRetries  int8
   Broker          string
+  Static          string
 }
 
 func (config *Configuration) Timeout() time.Duration {

@@ -15,6 +15,8 @@ func main() {
   router.GET("/_/*p", process)
   router.POST("/_/*p", process)
   
+  router.ServeFiles("/_static/*filepath", http.Dir(config.Static))
+  
   server := &http.Server{
     Addr:           config.Acceptor,
     Handler:        router,

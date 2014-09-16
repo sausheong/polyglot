@@ -4,5 +4,6 @@
   "WriteTimeout"   : 600,
   "RequestTimeout" : 2500,
   "RequestRetries" : 3,
-  "Broker"         : "tcp://localhost:1234"
+  "Broker"         : "tcp://localhost:1234",
+  "Static"         : "public"
 }
