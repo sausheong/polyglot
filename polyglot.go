@@ -18,8 +18,7 @@ func process(writer http.ResponseWriter, request *http.Request, _ httprouter.Par
   if request.Method == "POST" {
     err := request.ParseForm()
     failOnError(err, "Failed to parse form")
-    err = request.ParseMultipartForm(10485760)
-    failOnError(err, "Failed to parse multipart form")    
+    request.ParseMultipartForm(10485760)
   }
   
   // marshal the HTTP request struct into JSON
