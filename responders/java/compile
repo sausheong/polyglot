@@ -1,0 +1,1 @@
+javac -cp .:zmq.jar Hello.java 

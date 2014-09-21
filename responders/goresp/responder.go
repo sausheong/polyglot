@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ROUTEID = "GET/_/hello"
+	ROUTEID = "GET/_/hello/go"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	responder.Connect("tcp://localhost:4321")
 
 	//  Tell broker we're ready for work
-	fmt.Println("(%s) responder ready\n", identity)
+	fmt.Printf("%s - %s responder ready\n", ROUTEID, identity)
 	responder.Send(ROUTEID, 0)
 
 	for {

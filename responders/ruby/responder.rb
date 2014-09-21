@@ -3,7 +3,7 @@ require 'bundler'
 Bundler.require
 
 broker = "tcp://localhost:4321"
-routeid = "GET/_/test"
+routeid = "GET/_/hello/ruby"
 identity = SecureRandom.uuid
 
 puts "(#{identity}) responder ready."

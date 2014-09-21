@@ -173,6 +173,7 @@ The examples below shows how this can be done in various languages. The full lis
 * Ruby
 * Go
 * Python
+* Java
 
 Please send pull requests for sample responders in other languages!
 
@@ -278,7 +279,46 @@ while True:
   responder.send_multipart(response)
 ```
 
+### Java
 
+This example returns the request to the browser. Use the `compile` file to compile the java class.
+
+```java
+import org.zeromq.ZMQ;
+import java.util.UUID;
+
+ 
+public class Hello {
+
+  public static void main(String[] args) {
+    ZMQ.Context context = ZMQ.context(1);
+    String routeid = "GET/_/hello/java";
+    String identity = UUID.randomUUID().toString();
+    
+    ZMQ.Socket socket = context.socket(ZMQ.REQ);
+    socket.setIdentity(identity.getBytes());
+    socket.connect ("tcp://localhost:4321");
+ 
+    System.out.printf("%s - %s responder ready\n", routeid, identity);
+    
+    socket.send(routeid, 0);
+    try {
+      while (true) {
+        String request = socket.recvStr();        
+        
+        socket.send(routeid, ZMQ.SNDMORE);
+        socket.send("200", ZMQ.SNDMORE);
+        socket.send("{\"Content-Type\": \"text/html\"}", ZMQ.SNDMORE);
+        socket.send(request);
+      }      
+    } catch (Exception e) {
+      socket.close();
+      context.term();      
+    } 
+  }
+}
+```
+ 
 ## Static files
 
 To serve out static files, configure Polyglot to point to a directory you wish to serve the files from. For eg if you want to serve your files from the directory `public` you can change the settings in `config.json` like this:
@@ -297,6 +337,10 @@ To serve out static files, configure Polyglot to point to a directory you wish t
 
 All files (including files in the various subdirectories) can now be served from `http://<host>:8080/_static/` eg if you have a file `public/css/main.css` then you can access the file through `http://<host>:8080/_static/css/main.css`
   
+
+## Sample web app
+
+I wrote a sample web app called [Polyblog](https://github.com/sausheong/polyblog) that puts together a simple blog app using Polyglot.
 
 ## Extending an existing application
 

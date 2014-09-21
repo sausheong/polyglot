@@ -1,2 +1,4 @@
 hello_ruby: ruby -C ./ruby responder.rb
 hello_go: ./goresp/goresp
+hello_python: python python/responder.py
+hello_java: java -cp ./java/zmq.jar:./java -Djava.library.path=/usr/local/lib Hello
