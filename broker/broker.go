@@ -105,6 +105,10 @@ LOOP:
             responders[routeid] = append(responders[routeid], identity)
           }
         } else {
+          if !has_valid_http_method(routeid) {
+            danger("Backend", "Invalid route ID sent by responder", identity, ":", routeid)
+            break 
+          }  
           if responders[routeid] == nil {
             responders[routeid] = make([]string, 0)
             parked[routeid]  = make([]string, 0)
