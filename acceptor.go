@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-  fmt.Println("Polyglot Acceptor v0.1")
-  fmt.Println("")
   router := httprouter.New()
   
   router.GET("/_/*p", process)
@@ -24,7 +22,7 @@ func main() {
     WriteTimeout:   time.Duration(config.WriteTimeout * int64(time.Second)),
     MaxHeaderBytes: 1 << 20,
   }
+  fmt.Println("Polyglot Acceptor", version(), "started at", config.Acceptor)
   server.ListenAndServe()  
-
 }
 

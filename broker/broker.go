@@ -7,6 +7,7 @@ import (
   "time"
   "log"
   "os"
+  "strings"
 )
 
 var logger *log.Logger
@@ -22,8 +23,7 @@ func init() {
 }
 
 func main() {
-  fmt.Println("Polyglot Broker v0.1")
-  fmt.Println("")
+  fmt.Println("Polyglot Broker", version(), "started")
   frontend, _ := zmq.NewSocket(zmq.ROUTER)
   backend, _  := zmq.NewSocket(zmq.ROUTER)
   admin, _    := zmq.NewSocket(zmq.ROUTER)
@@ -81,12 +81,20 @@ LOOP:
         msg, err := s.RecvMessage(0)
         if err != nil {
           danger("Backend", "Cannot receive message", err)
-          break LOOP //  Interrupted
+          break 
         }
 
         identity, routeid, msg := unwrap_responder_message(msg)
+        if !has_valid_http_method(routeid) {
+          danger("Backend", "Invalid route ID sent by responder", identity, ":", routeid)
+          break 
+        }        
         
         if msg != nil {
+          if len(msg) < 3 {
+            danger("Backend", "Message length sent by responder is less than 3", routeid)
+            break          
+          }          
           _, err := frontend.SendMessage(routeid, "", msg[0], msg[1], msg[2])
           if err != nil {
             danger("Backend", "Cannot send message", err)
@@ -132,7 +140,7 @@ LOOP:
             }      
           } else {
             info("Route not found:", routeid)
-            _, err := frontend.SendMessage(routeid, "", "404", "{\"Content-Type\" : \"text/plain; charset=UTF-8\"}", "Route not found")
+            _, err := frontend.SendMessage(routeid, "", "404", "{\"Content-Type\" : \"text/html; charset=UTF-8\"}", "<html><body>Polyglot - route not found</body></html>")
             if err != nil {
               danger("Frontend", "Cannot send message for route not found", err)
             } 
@@ -145,7 +153,6 @@ LOOP:
 
 
 // for unwrapping the client and responder messages
-
 func unwrap_responder_message(msg []string) (identity string, routeid string, data []string) {
   identity = msg[0]
   if msg[1] == "" {
@@ -211,4 +218,19 @@ func show_routes() []string {
   }
   
   return r
+}
+
+// for testing responder route ID to make sure it starts with 
+// GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH
+
+func has_valid_http_method(routeid string) bool {
+  is_valid := strings.HasPrefix(routeid, "GET") ||
+              strings.HasPrefix(routeid, "HEAD") ||
+              strings.HasPrefix(routeid, "POST") ||
+              strings.HasPrefix(routeid, "DELETE") ||
+              strings.HasPrefix(routeid, "TRACE") ||
+              strings.HasPrefix(routeid, "OPTIONS") ||
+              strings.HasPrefix(routeid, "CONNECT") ||
+              strings.HasPrefix(routeid, "PATCH")
+  return is_valid
 }
