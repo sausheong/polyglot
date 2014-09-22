@@ -2,7 +2,7 @@ var zmq = require('zmq')
   , sock = zmq.socket('req');
 var uuid = require('node-uuid');
 
-routeid = "GET/_/hello";
+routeid = "GET/_/hello/node";
 identity = uuid.v4();
 sock.identity = identity;
 sock.connect('tcp://localhost:4321');

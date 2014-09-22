@@ -17,7 +17,7 @@ This also means you can scale and evolve your web app, building on what you have
 
 So what's the catch? 
 
-There must be a catch, and there is certainly one. Polyglot *increases* the complexity in the effort to develop web apps. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer. In fact it adds the complexity of the application, not only in the deployment but also in the development. 
+Polyglot *increases* the complexity in the effort to develop web apps. Unlike frameworks like Rails or Django or Express, Polyglot doesn't exist to make life easier for the programmer. In fact it adds the complexity of the application, not only in the deployment but also in the development. 
 
 As a programmer you trade complexity and effort for something you think is more important for the web app you're creating. In Polyglot, we are trading complexity and effort for:
 
@@ -25,13 +25,14 @@ As a programmer you trade complexity and effort for something you think is more 
 2. **Extensibility** -- by creating an acceptor as a controller in an existing web app, you can extend the applications through Polyglot
 3. **Multi-lingual, independent development** -- Polyglot responders can be developed independently in different programming languages, libraries and environments
 
-**Polyglot** is not for all types of web apps. You should only use Polyglot for web apps that need to be scaled in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web app never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once you create your web app and you or anyone else never need to add new features, Polyglot is probably not for you either.
+**Polyglot** is not for all web apps. You should only use Polyglot for web apps that need to be scaled in a highly performant way and/or need to be incrementally developed in multiple programming languages. For example, if your web app never needs to scale beyond a single server, you're probably better off using some other single language framework. And if once your web app is created, you or anyone else never need to add new features, Polyglot is probably not suitable either.
 
-The first two are understandable, but the third is quite strange, why would you want to develop a web app in multiple programming languages? There are good, practical reasons:
+Why would you want to develop a web app in multiple programming languages? There are good, practical reasons:
 
 1. Web apps you write are systems and they change over time and can be written or maintained by different groups of people. If you're not restricted to a particular platform or language, then the chances of getting an incrementally better piece of software is higher. 
 2. You can switch out the poor-performing responders and replace them with higher-performing ones. Different responders can have different criteria for performance, ease-of-development, ease-of-maintenance or quick turnaround in development. With a single programming language you are often forced to accept a compromise. With multiple programming languages, you can choose the platform and language as what you need for that particular responder
-3. Different responders can be written for specific performance gains or maintainability.
+3. Different responders can be written for specific performance gains or maintainability
+
 
 Why is even a 'web framework'? Web frameworks make life easier for programmers by making it easier to create web apps. While the added complexity of writing web apps with Polyglot make things more difficult initially, over time, the application is easier to extend and to evolve. With a bigger picture in mind, Polyglot _does_ make life easier for programmers.
 
@@ -178,10 +179,10 @@ require 'bundler'
 Bundler.require
 
 broker = "tcp://localhost:4321"
-routeid = "GET/_/test"
+routeid = "GET/_/hello/ruby"
 identity = SecureRandom.uuid
 
-puts "(#{identity}) responder ready."
+puts "#{routeid} - #{identity} responder ready."
 
 ctx = ZMQ::Context.new
 client = ctx.socket ZMQ::REQ
@@ -189,15 +190,12 @@ client.identity = identity
 client.connect broker
 
 client.send_string routeid
-
 loop do
   request = String.new
   client.recv_string request
-  puts request # do what you want to the request
   response = [routeid, "200", "{\"Content-Type\": \"text/html\"}", "Hello World"]
   client.send_strings response
 end
-  
 ```
 
 ### Go
@@ -373,7 +371,7 @@ Then run it like this:
 
    ./polyadm
    
-There is limited functionality at the moment.
+There is limited functionality for the command line admin at the moment.
 
 ## Current limitations
 
