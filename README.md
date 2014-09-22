@@ -212,7 +212,7 @@ import (
 )
 
 const (
-	ROUTEID = "GET/_/hello"
+	ROUTEID = "GET/_/hello/go"
 )
 
 func main() {
@@ -249,7 +249,7 @@ import zmq
 import uuid
 
 identity = str(uuid.uuid4())
-routeid = "GET/_/hello"
+routeid = "GET/_/hello/python"
 
 context = zmq.Context(1)
 responder = context.socket(zmq.REQ)
@@ -318,7 +318,7 @@ var zmq = require('zmq')
   , sock = zmq.socket('req');
 var uuid = require('node-uuid');
 
-routeid = "GET/_/hello";
+routeid = "GET/_/hello/node";
 identity = uuid.v4();
 sock.identity = identity;
 sock.connect('tcp://localhost:4321');
