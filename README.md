@@ -164,6 +164,7 @@ The examples below shows how this can be done in various languages. The full lis
 * Go
 * Python
 * Java
+* Node.js
 
 Please send pull requests for sample responders in other languages!
 
@@ -307,6 +308,32 @@ public class Hello {
     } 
   }
 }
+```
+
+### Node.js
+
+This example uses the [node.js bindings](https://github.com/JustinTulloss/zeromq.node) to ZeroMQ. Install the 2 modules `node-uuid` and `zmq` before running this code.
+
+
+```javascript
+var zmq = require('zmq')
+  , sock = zmq.socket('req');
+var uuid = require('node-uuid');
+
+routeid = "GET/_/hello";
+identity = uuid.v4();
+sock.identity = identity;
+sock.connect('tcp://localhost:4321');
+sock.send(routeid);
+
+console.log('%s - %s responder ready', routeid, identity);
+
+sock.on('message', function(msg){  
+  sock.send(routeid, zmq.ZMQ_SNDMORE);
+  sock.send("200", zmq.ZMQ_SNDMORE);
+  sock.send("{\"Content-Type\": \"text/html\"}", zmq.ZMQ_SNDMORE);
+  sock.send(msg);  
+});
 ```
  
 ## Static files
