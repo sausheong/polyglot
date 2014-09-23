@@ -2,5 +2,7 @@ concurrency:
   hello_ruby=5,
   hello_go=5,
   hello_python=5,
-  hello_java=5
+  hello_java=5,
+  hello_node=5,
+  hello_c=5
   
