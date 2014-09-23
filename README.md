@@ -228,7 +228,7 @@ broker = "tcp://localhost:4321"
 routeid = "GET/_/hello/ruby"
 identity = SecureRandom.uuid
 
-puts "#{routeid} - #{identity} responder ready."
+puts "#{routeid} - #{identity} responder ready"
 
 ctx = ZMQ::Context.new
 client = ctx.socket ZMQ::REQ
@@ -252,8 +252,8 @@ This example uses [Go ZMQ4 bindings](https://github.com/pebbe/zmq4) and returns 
 package main
 
 import (
-  zmq "github.com/pebbe/zmq4"
-  "fmt"
+	zmq "github.com/pebbe/zmq4"
+	"fmt"
   "code.google.com/p/go-uuid/uuid"
 )
 
@@ -269,8 +269,7 @@ func main() {
 	responder.SetIdentity(identity)
 	responder.Connect("tcp://localhost:4321")
 
-	//  Tell broker we're ready for work
-	fmt.Println("(%s) responder ready\n", identity)
+	fmt.Printf("%s - %s responder ready\n", ROUTEID, identity)
 	responder.Send(ROUTEID, 0)
 
 	for {
@@ -302,7 +301,7 @@ responder = context.socket(zmq.REQ)
 responder.setsockopt(zmq.IDENTITY, identity)
 responder.connect("tcp://localhost:4321")
 
-print "I: (%s) responder ready" % identity
+print "%s - %s responder ready" % (routeid, identity)
 
 responder.send(routeid)
 

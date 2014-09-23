@@ -18,7 +18,6 @@ func main() {
 	responder.SetIdentity(identity)
 	responder.Connect("tcp://localhost:4321")
 
-	//  Tell broker we're ready for work
 	fmt.Printf("%s - %s responder ready\n", ROUTEID, identity)
 	responder.Send(ROUTEID, 0)
 
