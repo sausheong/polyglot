@@ -90,13 +90,13 @@ func process(writer http.ResponseWriter, request *http.Request, _ httprouter.Par
         var data []byte
         // get content type
         ctype, hasCType := headers["Content-Type"]; if hasCType == true {
-          if strings.HasPrefix(ctype, "text") {
+          if is_text_mime_type(ctype) {
             data = []byte(body)
           } else {
             data, _ = base64.StdEncoding.DecodeString(body)
           }
         } else {
-          data, _ = base64.StdEncoding.DecodeString(body)
+          data = []byte(body) // if not given the content type, assume it's text
         }
 
         // write status and body to response
@@ -134,4 +134,14 @@ func process(writer http.ResponseWriter, request *http.Request, _ httprouter.Par
 func reply(writer http.ResponseWriter, status int, body []byte) {
   writer.WriteHeader(status)
   writer.Write(body)
+}
+
+func is_text_mime_type(ctype string) bool {
+  if strings.HasPrefix(ctype, "text") ||
+  strings.HasPrefix(ctype, "application/json") {
+    return true
+  } else {
+    return false
+  }
+  
 }
