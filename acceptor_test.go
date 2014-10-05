@@ -7,8 +7,6 @@ import(
     "github.com/julienschmidt/httprouter"
 )
 
-
-
 // Test basic responder flow that returns hello world
 func Test_GetHelloWorld(t *testing.T) {
    
@@ -50,5 +48,4 @@ func Test_GetJSON(t *testing.T) {
     t.Errorf("Body is %s", writer.Body)
   }    
 }
-
 
