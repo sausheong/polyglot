@@ -49,7 +49,7 @@ Polyglot has a very simple and basic architecture. It consists of 3 main compone
 
 Essentially, the Polyglot architecture revolves around using a broker to disassociate the processing units (responders) from the communications unit (acceptor), allowing the responders to be created in multiple languages.
 
-###Flow
+### Flow
 
 1. Client sents a HTTP request to the acceptor
 2. The acceptor converts the request into JSON and sends it to the broker, and waits for a response
